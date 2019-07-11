@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+
+  # example API for the resource server reverse proxy onto
+  nodejs-starter:
+    image: kubernetes.docker.engineering.csu.local:12345/nodejs-starter:1.1.0
+    container_name: nodejs-starter
+
+  # protects upstream API (nodejs-starter) with OpenID Connect
+  nginx-rs:
+    image: lego.docker.engineering.csu.local:12345/nginx-rs:${VERSION}
+    build:
+      context: ./nginx-rs
+      args:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - OPENRESTY_VERSION
+    container_name: nginx-rs
+    environment:
+      - PROXY_PASS
+      - DISCOVERY_URI
+      - CLIENT_ID
+      - CLIENT_SECRET
+      - SESSION_SECRET
+      - SSL_VERIFY
+      - ERROR_LOG_LEVEL
+
+  # protects example web application (index.html) with OpenID Connect
+  nginx-oidc:
+    image: lego.docker.engineering.csu.local:12345/nginx-oidc:${VERSION}
+    build:
+      context: ./nginx-oidc
+      args:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - OPENRESTY_VERSION
+    container_name: nginx-oidc
+    environment:
+      - REDIRECT_URI
+      - DISCOVERY_URI
+      - CLIENT_ID
+      - CLIENT_SECRET
+      - SESSION_SECRET
+      - SSL_VERIFY
+      - LOGOUT_PATH
+      - LOGOUT_REDIRECT_URI
+      - LOGOUT_WITH_ID_TOKEN_HINT
+      - ERROR_LOG_LEVEL
+    # example HTML page
+    volumes:
+      - ./nginx-oidc/index.html:/usr/local/openresty/nginx/html/my-app/index.html
+
+  # mock nginx-ingress
+  localhost:
+    image: kubernetes.docker.engineering.csu.local:12345/nginx:1.15
+    container_name: localhost
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./localhost/index.html:/usr/local/openresty/nginx/html/index.html
+      - ./localhost/localhost.crt:/etc/nginx/ssl/localhost.crt
+      - ./localhost/localhost.key:/etc/nginx/ssl/localhost.key
+      - ./localhost/default.conf:/etc/nginx/conf.d/default.conf

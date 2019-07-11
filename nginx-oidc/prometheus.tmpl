@@ -1,0 +1,25 @@
+# prometheus.tmpl
+#
+# This is a templated file, `envsubst` is used to replace env vars in the format $VARIABLE and ${VARIABLE}
+# To escape a dollar sign use ${DOLLAR}
+#
+# This file is installed to:
+#   `/etc/nginx/conf.d/prometheus.conf`
+#
+# It provides a metrics endpoint for prometheus to scrape
+# See https://github.com/knyar/nginx-lua-prometheus
+
+server {
+
+  server_name metrics;
+  listen 9145;
+
+  location /metrics {
+    content_by_lua '
+      metric_connections:set(ngx.var.connections_reading, {"reading"})
+      metric_connections:set(ngx.var.connections_waiting, {"waiting"})
+      metric_connections:set(ngx.var.connections_writing, {"writing"})
+      prometheus:collect()
+    ';
+  }
+}

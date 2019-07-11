@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NGINX-OIDC</title>
+  <meta name="description" content="Test page for nginx-openidc">
+  <meta name="author" content="BAE SYSTEMS Managed Security Services">
+  <script>
+    function apiRequest() {
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("nodejs-starter-reponse").innerHTML = this.responseText;
+        }
+      };
+      request.open("GET", "https://localhost/nodejs-starter/v1/");
+      request.send();
+    }
+  </script>
+</head>
+<body>
+  <h1>Welcome!</h1>
+  <h2>
+    LEGO NGINX OpenID Connect Service
+  </h2>
+  <p>
+    This is a test page used during development.
+    If you see this page you have sucessfully logged in using OpenID Connect.
+    Use the buttons below to make a call to OpenID Connect protected API or logout.
+  </p>
+  <p>
+    <button type="button" onclick="apiRequest()">Make NodeJS Starter API request</button>
+    <button onclick="location.href = 'logout';" style="float: right">Logout</button>
+  </p>
+  <p>
+    <code id="nodejs-starter-reponse"></code>
+  </p>
+</body>
+</html>

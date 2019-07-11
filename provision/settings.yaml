@@ -1,0 +1,39 @@
+# vagrant configuration
+box: centos/7
+hostname: nginx-oidc.dev.local
+name: nginx-oidc
+memory: 2048
+cpus: 2
+plugins:
+  - vagrant-vbguest
+  - vagrant-proxyconf
+ports:
+  - 80:80
+  - 443:443
+  - 9145:9145
+modules:
+  - puppetlabs-docker
+  - puppet-archive
+  - puppetlabs-stdlib
+versions:
+  docker: 18.06.2.ce
+  compose: 1.23.2
+  helm: 2.13.1
+docker:
+  registries:
+    - kubernetes.docker.engineering.csu.local:12345
+    - lego.docker.engineering.csu.local:12345
+packages:
+  - epel-release
+  - git
+  - gitflow
+  - make
+  - gcc
+  - gcc-c++
+  - autoconf
+  - automake
+  - vim
+  - curl
+  - wget
+  - unzip
+  - htop
